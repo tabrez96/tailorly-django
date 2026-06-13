@@ -26,6 +26,15 @@ wheels = [
 ]
 
 [[package]]
+name = "phonenumbers"
+version = "9.0.32"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/11/ba7611cadc8c99b797416d0dada535c02890dc21b759dfef60a3751d2e20/phonenumbers-9.0.32.tar.gz", hash = "sha256:108ad0237202d2f6cf4b342fac411f22808d85187c3a366152a2af7ed3202a8e", size = 2306598, upload-time = "2026-06-05T05:48:38.909Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c6/e9/1ca526105e792b7ed752fd0ff5732ab01185f2deb719ae6f30183fb21143/phonenumbers-9.0.32-py2.py3-none-any.whl", hash = "sha256:fbcd40d3b11920ee77b1d34a54c3b64c6648a90b8e37222eb62e7fafb87db3e7", size = 2595438, upload-time = "2026-06-05T05:48:36.066Z" },
+]
+
+[[package]]
 name = "sqlparse"
 version = "0.5.5"
 source = { registry = "https://pypi.org/simple" }
@@ -40,10 +49,14 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
+    { name = "phonenumbers" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "django", specifier = ">=6.0.6" }]
+requires-dist = [
+    { name = "django", specifier = ">=6.0.6" },
+    { name = "phonenumbers", specifier = ">=9.0.32" },
+]
 
 [[package]]
 name = "tzdata"
