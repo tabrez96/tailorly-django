@@ -1,0 +1,9 @@
+{
+  // Point VSCode at the project's virtual environment so Pylance can resolve
+  // and navigate into installed packages (Django, etc.). Without this it falls
+  // back to system Python, which doesn't have our deps and breaks go-to-definition.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+  // Make sure the language server actually indexes packages in .venv.
+  "python.analysis.extraPaths": ["${workspaceFolder}/.venv/lib/python3.12/site-packages"]
+}
