@@ -8,3 +8,29 @@ dependencies = [
     "django>=6.0.6",
     "phonenumbers>=9.0.32",
 ]
+
+[tool.ruff]
+target-version = "py312"
+# Generated migrations aren't hand-maintained; don't lint them.
+extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, isort, pyupgrade, bugbear. Ruff's own default is
+# ~400 rules, which buries the useful ones.
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Stock startproject output; the validator dotted paths can't be wrapped cleanly.
+"tailorly/settings.py" = ["E501"]
+
+[tool.basedpyright]
+venvPath = "."
+venv = ".venv"
+# basedpyright defaults to "recommended", which is stricter than pyright's
+# "strict" and floods Django models with false positives.
+typeCheckingMode = "standard"
+
+[dependency-groups]
+dev = [
+    "django-stubs>=6.1.1",
+]

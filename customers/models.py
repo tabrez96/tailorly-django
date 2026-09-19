@@ -1,6 +1,7 @@
 import phonenumbers
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
+
 
 class Customer(models.Model):
     """
@@ -27,11 +28,13 @@ class Customer(models.Model):
         except phonenumbers.NumberParseException:
             raise ValidationError({
                 'phone': 'Could not recognize the phone number.'
-            })
+            }) from None
 
         if not phonenumbers.is_valid_number(parsed):
             raise ValidationError({
                 'phone': 'Invalid phone number for the country.'
             })
 
-        self.phone = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+        self.phone = phonenumbers.format_number(
+            parsed, phonenumbers.PhoneNumberFormat.E164
+        )
