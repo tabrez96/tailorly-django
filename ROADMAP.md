@@ -53,7 +53,7 @@ Suggested order: **0.1 → 0.2 → 0.4 → 0.8 → 0.3 → 0.5 → 0.6 → 0.7**
 only genuinely irreversible one; 0.8 rides along with the settings work; 0.7 is the one item that
 could defer to Phase 4 without pain.
 
-- [ ] **0.1** Add a custom user model (`accounts.User`, subclassing `AbstractUser`) and set `AUTH_USER_MODEL` **before any further migrations exist**. Swapping this after production data exists requires manual table surgery.
+- [x] **0.1** Add a custom user model (`accounts.User`, subclassing `AbstractUser`) and set `AUTH_USER_MODEL` **before any further migrations exist**. Swapping this after production data exists requires manual table surgery.
   - `customers/migrations/0001_initial.py` already exists, but `Customer` has no FK to `User`, so there is no swappable-model dependency to unwind — dropping `db.sqlite3` and re-migrating is enough.
   - *Done when:* `createsuperuser` writes a row to `accounts_user`, and `get_user_model()` returns `accounts.User`.
 - [ ] **0.2** Split settings into `base/dev/prod` (or use `django-environ`). Move `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, and DB config to env vars. Current `settings.py` is stock `startproject` output with a committed dev secret key.
