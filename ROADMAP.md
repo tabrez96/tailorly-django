@@ -4,6 +4,8 @@ A phased task list to take this from a single `Customer` model to a working shop
 
 Phases are ordered by dependency, not by importance. Phase 0 items are the ones that are painful to change later — do them first.
 
+**This file is the progress tracker.** Tick the boxes here as work lands — there is no separate checklist to keep in sync.
+
 ---
 
 ## Settled constraints
@@ -47,14 +49,32 @@ Consequences to design for:
 
 Hard-to-reverse decisions. Nothing else should start before these land.
 
+Suggested order: **0.1 → 0.2 → 0.4 → 0.8 → 0.3 → 0.5 → 0.6 → 0.7**. 0.1 first because it is the
+only genuinely irreversible one; 0.8 rides along with the settings work; 0.7 is the one item that
+could defer to Phase 4 without pain.
+
 - [ ] **0.1** Add a custom user model (`accounts.User`, subclassing `AbstractUser`) and set `AUTH_USER_MODEL` **before any further migrations exist**. Swapping this after production data exists requires manual table surgery.
+  - `customers/migrations/0001_initial.py` already exists, but `Customer` has no FK to `User`, so there is no swappable-model dependency to unwind — dropping `db.sqlite3` and re-migrating is enough.
+  - *Done when:* `createsuperuser` writes a row to `accounts_user`, and `get_user_model()` returns `accounts.User`.
 - [ ] **0.2** Split settings into `base/dev/prod` (or use `django-environ`). Move `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, and DB config to env vars. Current `settings.py` is stock `startproject` output with a committed dev secret key.
+  - The committed key is in git history, so **rotate it** — moving it to an env var does not un-leak it. Commit a `.env.example`; gitignore the real `.env`. Remember the `DJANGO_SETTINGS_MODULE` defaults in `manage.py`/`wsgi.py`/`asgi.py` and the `tailorly/settings.py` per-file ignore in `pyproject.toml`.
+  - *Done when:* `runserver` works with only `.env` present, and no `django-insecure` key remains in the working tree.
 - [ ] **0.3** Add an abstract `TimeStampedModel` (`created_at`/`updated_at`) and inherit it everywhere. Retrofit `Customer`.
+  - *Done when:* `Customer` has both timestamps and `makemigrations --check` is clean.
 - [ ] **0.4** Switch to PostgreSQL for dev/prod (SQLite is fine for tests). You will want `JSONField` querying, proper constraints, and concurrent writes.
+  - Needs the env plumbing from 0.2. Add `psycopg[binary]`, and write down in the README how Postgres is expected to run locally (Docker Compose service vs. system install).
+  - *Done when:* `migrate` runs clean against a fresh Postgres database and the test suite still passes on whichever backend you settled on.
 - [ ] **0.5** Set up the test harness: `pytest-django` (or stick with Django's runner), `factory_boy` for fixtures, and a `make test` / `just test` entry point.
+  - First real test should be `Customer.clean()` phone normalization — valid, invalid, unparseable, already-E.164. `customers/tests.py` is still the empty `startapp` stub.
+  - *Done when:* a single `just test` (or `make test`) runs green from a clean checkout.
 - [ ] **0.6** Add `ruff` for lint + format and wire a pre-commit hook.
+  - Partly done: `[tool.ruff]` config landed in `ca3dfdd`, but ruff is not a project dependency and there is no hook — only the editor LSP sees it. No formatter is configured yet. Do the one-off format pass as its own commit so it does not pollute later diffs.
+  - *Done when:* `ruff check .` and `ruff format --check .` both pass, and the hook fires on commit.
 - [ ] **0.7** Add media file handling (`MEDIA_ROOT`/`MEDIA_URL`, S3 or local) — needed for reference photos in Phase 4.
+  - Set an upload size cap and an allowed-content-type check now, so every later image field inherits them. Gitignore `media/`.
+  - *Done when:* a file uploaded through the admin is retrievable at its `MEDIA_URL`.
 - [ ] **0.8** Set `TIME_ZONE = 'Asia/Kolkata'` (keep `USE_TZ = True`).
+  - *Done when:* a freshly created `Customer` shows an IST timestamp in the admin.
 
 ## Phase 1 — People, roles & the PII boundary
 
