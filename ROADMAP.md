@@ -56,7 +56,10 @@ could defer to Phase 4 without pain.
 - [x] **0.1** Add a custom user model (`accounts.User`, subclassing `AbstractUser`) and set `AUTH_USER_MODEL` **before any further migrations exist**. Swapping this after production data exists requires manual table surgery.
   - `customers/migrations/0001_initial.py` already exists, but `Customer` has no FK to `User`, so there is no swappable-model dependency to unwind — dropping `db.sqlite3` and re-migrating is enough.
   - *Done when:* `createsuperuser` writes a row to `accounts_user`, and `get_user_model()` returns `accounts.User`.
-- [ ] **0.2** Split settings into `base/dev/prod` (or use `django-environ`). Move `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, and DB config to env vars. Current `settings.py` is stock `startproject` output with a committed dev secret key.
+- [x] **0.2** Split settings into `base/dev/prod` (or use `django-environ`). Move `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, and DB config to env vars. Current `settings.py` is stock `startproject` output with a committed dev secret key.
+  - **Decided: `django-environ`**, not a `base/dev/prod` settings package. The environments
+    differ in values, not structure, and this leaves the `DJANGO_SETTINGS_MODULE` defaults in
+    `manage.py`/`wsgi.py`/`asgi.py` untouched. Revisit if structural differences appear.
   - The committed key is in git history, so **rotate it** — moving it to an env var does not un-leak it. Commit a `.env.example`; gitignore the real `.env`. Remember the `DJANGO_SETTINGS_MODULE` defaults in `manage.py`/`wsgi.py`/`asgi.py` and the `tailorly/settings.py` per-file ignore in `pyproject.toml`.
   - *Done when:* `runserver` works with only `.env` present, and no `django-insecure` key remains in the working tree.
 - [ ] **0.3** Add an abstract `TimeStampedModel` (`created_at`/`updated_at`) and inherit it everywhere. Retrofit `Customer`.
